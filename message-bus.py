@@ -24,8 +24,9 @@ class MessageAggregator(object):
             self.callback_on_update()
 
     def pop_message(self, channel):
-        for message in filter(lambda msg: msg[:msg.find(":")] == channel, self.messages):
-            return self.messages.pop(message)
+        messages = [msg for msg in self.messages if msg[:msg.find(":")] == channel]
+        for msg in messages:
+            return self.messages.pop(msg)
         return None
 
     def register_callback_on_update(self, callback):
