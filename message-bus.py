@@ -20,7 +20,7 @@ class MessageAggregator(object):
         else:
             self.messages[unique_msg_key] = message
 
-        if self.callback_on_update is not None:
+        if self.callback_on_update:
             self.callback_on_update()
 
     def pop_message(self, channel):
@@ -35,7 +35,7 @@ class MessageAggregator(object):
 
 class MessageBusApplication(tornado.web.Application):
     def __init__(self, handlers=None, default_host=None, transforms=None, **settings):
-        super(MessageBusApplication, self).__init__(handlers, default_host, transforms, **settings)
+        super().__init__(handlers, default_host, transforms, **settings)
         self.message_aggregator = MessageAggregator()
         self.message_aggregator.register_callback_on_update(self._resume_connections)
         self.pending_connections = []
@@ -44,7 +44,7 @@ class MessageBusApplication(tornado.web.Application):
         connection_to_release = []
         for connection in self.pending_connections:
             message = self.message_aggregator.pop_message(connection.channel)
-            if message is not None:
+            if message:
                 connection.finish(message)
                 connection_to_release.append(connection)
         for conn in connection_to_release:
